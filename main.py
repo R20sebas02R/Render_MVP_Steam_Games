@@ -85,11 +85,20 @@ def countreviews(fecha_inicial : str, fecha_final : str):
     mask_true = df_filtrado['recomendation'] == True
     cantidad_true = mask_true.sum()
 
-    # Calcular el porcentaje de recomendación
-    Porcentaje_recomendacion = (cantidad_true / cantidad_recomendations) * 100
+    # Inicializar el porcentaje de recomendación en 0.0
+    Porcentaje_recomendacion = 0.0
 
-    # Redondear el porcentaje a dos decimales
-    Porcentaje_recomendacion = round(Porcentaje_recomendacion, 2)
+    # Verificar si cantidad_recomendations no es cero antes de la división
+    if cantidad_recomendations != 0:
+        Porcentaje_recomendacion = (cantidad_true / cantidad_recomendations) * 100
+        # Redondear el porcentaje a dos decimales
+        Porcentaje_recomendacion = round(Porcentaje_recomendacion, 2)
+    else:
+        Porcentaje_recomendacion = 'No hay recomendaciones'
+
+    # Convertir los valores numéricos a cadenas
+    Cantidad_usuarios = str(Cantidad_usuarios)
+    Porcentaje_recomendacion = str(Porcentaje_recomendacion)
 
     return {'Cantidad de usuarios': Cantidad_usuarios,
             'Porcentaje de recomendación': Porcentaje_recomendacion}
