@@ -54,7 +54,7 @@ def userdata(user_id: str):
 #-------------------------------------------------------------------------------------------------------------------------------
 
 
-@app.get('/countreviews/{fecha_inicial}, {fecha_final}')
+@app.get('/countreviews/{fecha_inicial}/{fecha_final}')
 def countreviews(fecha_inicial : str, fecha_final : str):
 
     # Analizar las fechas usando dateutil.parser
