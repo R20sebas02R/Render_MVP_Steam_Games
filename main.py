@@ -88,6 +88,10 @@ def countreviews(fecha_inicial : str, fecha_final : str):
     # Calcular el porcentaje de recomendación
     Porcentaje_recomendacion = (cantidad_true / cantidad_recomendations) * 100
 
+    # Convertir los valores numéricos a tipos nativos de Python
+    Cantidad_usuarios = int(Cantidad_usuarios)
+    Porcentaje_recomendacion = float(Porcentaje_recomendacion)
+
     return {'Cantidad de usuarios': Cantidad_usuarios,
             'Porcentaje de recomendación': Porcentaje_recomendacion}
     
