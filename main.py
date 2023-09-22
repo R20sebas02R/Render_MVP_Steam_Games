@@ -28,47 +28,27 @@ reviews_posted = pd.read_parquet('Data_Consumible/reviews_posted.parquet')
 
 
 @app.get('/userdata/{user_id}')
-def userdata (user_id : str):
+def userdata(user_id: str):
+    usuario_tabla_items = users_items[users_items['user_id'] == user_id]
 
-  '''
-  Cantidad Gastada
-  '''
-  '''
-  Aquí estoy utilizando la columna 'user_id' de users_items, también la columna 'user_items_ids'
-  También estoy utilizando la columna 'id' de steam_games, también la columna 'price' y
-  'discount_price'
-  '''
-  usuario_tabla_items = users_items[users_items['user_id'] == user_id]
-
-  if not usuario_tabla_items.empty:
+    if not usuario_tabla_items.empty:
         user_items_ids = usuario_tabla_items['user_items_ids']
         user_items_ids = [int(elemento) for elemento in user_items_ids[0]]
         usuario_steamGames = steam_games[steam_games['id'].isin(user_items_ids)]
         Cantidad_gastado = usuario_steamGames['price'].sum() - usuario_steamGames['discount_price'].sum()
 
-        '''
-        Porcentaje de Recomendación
-        '''
-        '''
-        Aquí estoy utilizando la columna 'user_id' de users_reviews, también la columna
-        'porcentaje_recomendacion'
-        '''
         usuario_tabla_reviews = user_reviews[user_reviews['user_id'] == user_id]
-        Porcentaje_recomendación = usuario_tabla_reviews['porcentaje_recomendacion'][0]
+        Porcentaje_recomendación = usuario_tabla_reviews['porcentaje_recomendacion'].values[0].item()
 
-        '''
-        Cantidad de items
-        '''
-        '''
-        Aquí estoy utilizando la columna 'items_count' de users_items
-        '''
-        Cantidad_items = usuario_tabla_items['items_count'][0]
+        Cantidad_items = usuario_tabla_items['items_count'].values[0].item()
 
-        return {'Cantidad de dinero gastado': Cantidad_gastado,
-                  'Porcentaje de recomendación': Porcentaje_recomendación,
-                  'Cantidad de items': Cantidad_items}
-  else:
-      return {'Usuario no existe'}
+        return {
+            'Cantidad de dinero gastado': Cantidad_gastado,
+            'Porcentaje de recomendación': Porcentaje_recomendación,
+            'Cantidad de items': Cantidad_items
+        }
+    else:
+        return {'Usuario no existe'}
 
 
 #-------------------------------------------------------------------------------------------------------------------------------
