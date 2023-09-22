@@ -243,7 +243,7 @@ def recomendacion_juego(id_de_producto : int, n=5):
         similitudes.append(similitud)
 
     # Obtener los índices de los juegos más similares (excluyendo el juego dado)
-    indices_similares = sorted(range(len(similitudes)), key=lambda i: similitudes[i], reverse=True)[:n+1]
+    indices_similares = sorted(range(len(similitudes)), key=lambda i: similitudes[i], reverse=True)[:int(n)+1]
     indices_similares = [i for i in indices_similares if steam_games.iloc[i]['id'] != id_de_producto]
 
     # Obtener los IDs y nombres recomendados (en lugar de especificaciones) sin el juego dado
