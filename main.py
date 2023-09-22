@@ -19,7 +19,7 @@ app = FastAPI()
 
 # Cargamos los archivos
 steam_games = pd.read_parquet('Data_Consumible/steam_games.parquet')
-user_items = pd.read_parquet('Data_Consumible/user_items.parquet')
+users_items = pd.read_parquet('Data_Consumible/users_items.parquet')
 user_reviews = pd.read_parquet('Data_Consumible/user_reviews.parquet')
 reviews_posted = pd.read_parquet('Data_Consumible/reviews_posted.parquet')
 
@@ -38,33 +38,37 @@ def userdata (user_id : str):
   También estoy utilizando la columna 'id' de steam_games, también la columna 'price' y
   'discount_price'
   '''
-  usuario_tabla_items = user_items.query("user_id == @user_id").iloc[0]
-  user_items_ids = usuario_tabla_items['user_items_ids']
-  user_items_ids = [int(elemento) for elemento in user_items_ids]
-  usuario_steamGames = steam_games[steam_games['id'].isin(user_items_ids)]
-  Cantidad_gastado = usuario_steamGames['price'].sum() - usuario_steamGames['discount_price'].sum()
+  usuario_tabla_items = users_items[users_items['user_id'] == user_id]
 
-  '''
-  Porcentaje de Recomendación
-  '''
-  '''
-  Aquí estoy utilizando la columna 'user_id' de users_reviews, también la columna
-  'porcentaje_recomendacion'
-  '''
-  usuario_tabla_reviews = user_reviews.query("user_id == @user_id").iloc[0]
-  Porcentaje_recomendación = usuario_tabla_reviews['porcentaje_recomendacion']
+  if not usuario_tabla_items.empty:
+        user_items_ids = usuario_tabla_items['user_items_ids']
+        user_items_ids = [int(elemento) for elemento in user_items_ids[0]]
+        usuario_steamGames = steam_games[steam_games['id'].isin(user_items_ids)]
+        Cantidad_gastado = usuario_steamGames['price'].sum() - usuario_steamGames['discount_price'].sum()
 
-  '''
-  Cantidad de items
-  '''
-  '''
-  Aquí estoy utilizando la columna 'items_count' de users_items
-  '''
-  Cantidad_items = usuario_tabla_items['items_count']
+        '''
+        Porcentaje de Recomendación
+        '''
+        '''
+        Aquí estoy utilizando la columna 'user_id' de users_reviews, también la columna
+        'porcentaje_recomendacion'
+        '''
+        usuario_tabla_reviews = user_reviews[user_reviews['user_id'] == user_id]
+        Porcentaje_recomendación = usuario_tabla_reviews['porcentaje_recomendacion'][0]
 
-  return {'Cantidad de dinero gastado': Cantidad_gastado,
-            'Porcentaje de recomendación': Porcentaje_recomendación,
-            'Cantidad de items': Cantidad_items}
+        '''
+        Cantidad de items
+        '''
+        '''
+        Aquí estoy utilizando la columna 'items_count' de users_items
+        '''
+        Cantidad_items = usuario_tabla_items['items_count'][0]
+
+        return {'Cantidad de dinero gastado': Cantidad_gastado,
+                  'Porcentaje de recomendación': Porcentaje_recomendación,
+                  'Cantidad de items': Cantidad_items}
+  else:
+      return {'Usuario no existe'}
 
 
 #-------------------------------------------------------------------------------------------------------------------------------
@@ -106,15 +110,16 @@ def countreviews(fecha_inicial : str, fecha_final : str):
 
     return {'Cantidad de usuarios': Cantidad_usuarios,
             'Porcentaje de recomendación': Porcentaje_recomendacion}
-
+    
 
 #-------------------------------------------------------------------------------------------------------------------------------
 
 
 @app.get('/genre/{genero}')
+
 def genre(genero : str):
 
-  with open('/content/drive/My Drive/DataOutput_mvp_steam/generos_ranking.json', 'r') as archivo:
+  with open('Data_Consumible/generos_ranking.json', 'r') as archivo:
     generos_ranking = json.load(archivo)
 
   # Convierte las claves del diccionario en una lista
@@ -134,7 +139,7 @@ def genre(genero : str):
 @app.get('/userforgenre/{genero}')
 def userforgenre(genero : str):
 
-    with open('/content/drive/My Drive/DataOutput_mvp_steam/generos_usuarios.json', 'r') as archivo:
+    with open('Data_Consumible/generos_usuarios.json', 'r') as archivo:
         generos_usuarios = json.load(archivo)
 
     # Verificar si el género existe en el diccionario
@@ -150,7 +155,7 @@ def userforgenre(genero : str):
     # Tomar los cinco mayores elementos
     cinco_mayores = dict(list(genero_ordenado.items())[:5])
 
-    return cinco_mayores
+    return {f'Top 5 de usuarios con más horas de juego en el género {genero} ': cinco_mayores}
 
 
 #-------------------------------------------------------------------------------------------------------------------------------
